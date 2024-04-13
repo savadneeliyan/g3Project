@@ -1,0 +1,43 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif !important;
+  font-style: normal;
+  color: #263032;
+}
+body {
+  background: #f8f8f8;
+}
+
+/* .poppins-regular {
+  font-weight: 400;
+  font-style: normal;
+}
+
+.poppins-medium {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+} */
+
+::-webkit-scrollbar {
+  display: none;
+}
+select {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+select::-webkit-scrollbar {
+  width: 0;
+}
+
+::placeholder,.MuiOutlinedInput-input::placeholder {
+  color: #707d89 !important;
+  opacity: 1 !important;
+}
+
+
+.Toastify__toast {
+  background-color: #aaf5aa;
+}
