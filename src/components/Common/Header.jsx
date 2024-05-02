@@ -12,29 +12,33 @@ function Header() {
     <Box
       sx={{
         width: "100%",
-        height: "66px",
+        height: "4.125rem",
         backgroundColor: "#fff",
         display: "flex",
         alignItems: "center",
         justifyContent: "end",
-        gap: "8px",
-        paddingRight: "20px",
+        gap: "0.5rem",
+        paddingRight: "1.25rem",
         backgroundColor: "#fff",
       }}
     >
       <Box
         sx={{
           display: "flex",
-          gap: "10px",
+          gap: "0.625rem",
           alignItems: "center",
         }}
       >
         <Box
           sx={{
-            width: "40px",
-            height: "40px",
+            width: "2.5rem",
+            height: "2.5rem",
             objectFit: "cover",
-            borderRadius: "10px",
+            borderRadius: "0.625rem",
+            "& img": {
+              width: "100%",
+              height: "100%",
+            }
           }}
         >
           <img src="/profile.png" alt="profile image" />

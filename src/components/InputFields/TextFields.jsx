@@ -15,17 +15,19 @@ export const NormalTextField = ({
         sx={{
           width: "100%",
           backgroundColor: "#fff",
-          borderRadius: "8px",
-          fontSize: "12px",
-          lineHeight: "18px",
+          borderRadius: "0.5rem",
+          fontSize: "0.75rem",
+          lineHeight: "1.125rem",
           "& .MuiOutlinedInput-input": {
-            padding: "11px 16px",
-            fontSize: "12px",
-            lineHeight: "20px",
+            padding: "0.688rem 1rem",
+            fontSize: "0.75rem",
+            lineHeight: "1.25rem",
           },
           "& fieldset": {
-            border: `1px solid #EFEFEF ${removeFocusedBorder && "!important"}`,
-            borderRadius: "8px",
+            border: `0.063rem solid #EFEFEF ${
+              removeFocusedBorder && "!important"
+            }`,
+            borderRadius: "0.5rem",
           },
         }}
         placeholder={placeholder}
@@ -34,7 +36,9 @@ export const NormalTextField = ({
         {...props}
       />
       {error && (
-        <FormHelperText sx={{ ml: "10px", color: "red", fontSize: "10px" }}>
+        <FormHelperText
+          sx={{ ml: "0.625rem", color: "red", fontSize: "0.625rem" }}
+        >
           {helperText}
         </FormHelperText>
       )}

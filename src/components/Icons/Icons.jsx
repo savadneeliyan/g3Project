@@ -1,5 +1,6 @@
-export const DeleteIcon = () => (
+export const DeleteIcon = ({ handleClick }) => (
   <svg
+    onClick={handleClick}
     width="10"
     height="10"
     viewBox="0 0 10 10"

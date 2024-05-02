@@ -5,21 +5,21 @@ function ColorPicker({ label, value, handleChange, id, ...props }) {
   return (
     <Box
       sx={{
-        border: "1px solid #EFEFEF",
-        padding: "7px 16px",
-        borderRadius: "8px",
+        border: "0.063rem solid #EFEFEF",
+        padding: "0.438rem 1rem",
+        borderRadius: "0.5rem",
         display: "flex",
-        gap: "20px",
+        gap: "1.25rem",
         justifyContent: "space-between",
-        alignItems:"center",
+        alignItems: "center",
         color: "#707D89",
         position: "relative",
       }}
     >
       <Typography
         sx={{
-          fontSize: "12px",
-          lineHeight: "18px",
+          fontSize: "0.75rem",
+          lineHeight: "1.125rem",
           color: "#707D89",
         }}
       >
@@ -29,7 +29,7 @@ function ColorPicker({ label, value, handleChange, id, ...props }) {
         sx={{
           display: "flex",
           alignItems: "center",
-          gap: "8px",
+          gap: "0.5rem",
         }}
       >
         <svg
@@ -53,19 +53,19 @@ function ColorPicker({ label, value, handleChange, id, ...props }) {
             },
             "& label": {
               cursor: "pointer",
-              width: "26px",
-              height: "26px",
-              borderRadius: "4px",
+              width: "1.625rem",
+              height: "1.625rem",
+              borderRadius: "0.25rem",
               padding: "0",
               margin: "0",
-              border: "1px solid #EFEFEF",
+              border: "0.063rem solid #EFEFEF",
               outline: "none",
               background: value,
               display: "block",
             },
           }}
         >
-          <label for={id}></label>
+          <label htmlFor={id}></label>
 
           <input
             type="color"

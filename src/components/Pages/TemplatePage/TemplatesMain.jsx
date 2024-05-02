@@ -1,26 +1,48 @@
 import { Box, Button, Typography } from "@mui/material";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import TemplateTable from "./TemplateTable";
-import { TemplateContext } from "../../Context/TemplateContext";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { templateFindAllAction } from "../../../Redux/Action/ThemeAction";
 
 function TemplatesMain() {
   const navigate = useNavigate();
-  const { templateData, setTemplateData } = useContext(TemplateContext);
+  const dispatch = useDispatch();
 
-  const [data, setData] = useState(templateData);
+  // get template data
+  let { templateListFindAllSuccess } = useSelector((state) => {
+    return state.findTemplateList;
+  });
 
+  // set template data
+  useEffect(() => {
+    if (templateListFindAllSuccess) {
+      setData(templateListFindAllSuccess);
+    }
+  }, [templateListFindAllSuccess]);
+
+  useEffect(() => {
+    dispatch(templateFindAllAction());
+  }, [dispatch]);
+
+  const [data, setData] = useState();
+
+  // handle search field
   const handleSearchChange = (e) => {
     let value = e.target.value;
-    setData(templateData.filter((item) => item.templateName.includes(value)));
+    setData(
+      templateListFindAllSuccess?.filter((item) =>
+        item.template_name.includes(value)
+      )
+    );
   };
 
   return (
     <Box>
       <Box
         sx={{
-          mt: "40px",
-          mb: "32px",
+          mt: "2.5rem",
+          mb: "2rem",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -29,7 +51,7 @@ function TemplatesMain() {
       >
         <Typography
           sx={{
-            fontSize: "16px",
+            fontSize: "1rem",
             fontWeight: "500",
           }}
         >
@@ -37,13 +59,13 @@ function TemplatesMain() {
         </Typography>
         <Button
           sx={{
-            px: "28px",
-            py: "6px",
+            px: "1.75rem",
+            py: "0.375rem",
             color: "#000080",
-            border: "1px solid #000080",
-            borderRadius: "50px",
+            border: "0.063rem solid #000080",
+            borderRadius: "3.125rem",
             fontWeight: "500",
-            fontSize: "12px",
+            fontSize: "0.75rem",
             textTransform: "initial",
           }}
           onClick={() => navigate(`/add-templates`)}
@@ -54,8 +76,8 @@ function TemplatesMain() {
 
       <Box
         sx={{
-          padding: "25px",
-          borderRadius: "6px",
+          padding: "1.563rem",
+          borderRadius: "0.375rem",
           backgroundColor: "#fff",
         }}
       >
@@ -63,25 +85,25 @@ function TemplatesMain() {
           <Box
             sx={{
               display: "flex",
-              border: "1px solid #EFEFEF",
-              borderRadius: "20px",
-              padding: "2px",
-              maxWidth: "272px",
+              border: "0.063rem solid #EFEFEF",
+              borderRadius: "1.25rem",
+              padding: "0.125rem",
+              maxWidth: "17rem",
               overflow: "hidden",
-              pl: "16px",
-              mb: "20px",
+              pl: "1rem",
+              mb: "1.25rem",
               "& input": {
                 outline: "none",
                 border: "none",
-                width: "calc(100% - 26px)",
+                width: "calc(100% - 1.625rem)",
               },
             }}
           >
             <input placeholder="Search..." onChange={handleSearchChange} />
             <Box
               sx={{
-                width: "26px",
-                height: "26px",
+                width: "1.625rem",
+                height: "1.625rem",
                 borderRadius: "50%",
                 backgroundColor: "rgba(0,0,128,.12)",
                 display: "flex",

@@ -29,8 +29,11 @@ export const SelectFieldWithOutBorder = ({ value, handleChange, ...props }) => {
           display: "none",
         },
         "& .MuiInputBase-input": {
-          fontSize: "13px",
+          fontSize: "0.813rem",
           color: "#3F434A",
+        },
+        "& .MuiSelect-select": {
+          padding: "1.031rem 0.875rem",
         },
       }}
       {...props}
@@ -56,17 +59,17 @@ export const SelectFieldWithLabel = ({
         "& fieldset": {
           borderColor: "#EFEFEF !important",
           outline: "none",
-          borderRadius: "8px",
+          borderRadius: "0.5rem",
           top: 0,
         },
         "& .MuiInputLabel-animated[data-shrink='true'] ": {
           display: "none",
         },
         "& .MuiOutlinedInput-input ": {
-          padding: "9px 16px",
+          padding: "0.563rem 1rem",
         },
         "& .MuiInputLabel-root  ": {
-          transform: " translate(14px, 12px) scale(1)",
+          transform: " translate(0.875rem, 0.75rem) scale(1)",
         },
         "& legend ": {
           display: "none",
@@ -77,9 +80,9 @@ export const SelectFieldWithLabel = ({
         id="demo-simple-select-helper-label"
         sx={{
           color: "#707D89 !important",
-          fontSize: "12px",
-          lineHeight: "20px",
-          transform: " translate(14px, 12px) scale(1)",
+          fontSize: "0.75rem",
+          lineHeight: "1.25rem",
+          transform: " translate(0.875rem, 0.75rem) scale(1)",
         }}
       >
         {label}
@@ -92,6 +95,7 @@ export const SelectFieldWithLabel = ({
         onChange={handleChange}
         {...props}
       >
+        {/* {console.log(optionList)} */}
         {optionList?.map((item, i) => (
           <MenuItem key={i} value={item}>
             {item}
@@ -99,7 +103,9 @@ export const SelectFieldWithLabel = ({
         ))}
       </Select>
       {error && (
-        <FormHelperText sx={{ ml: "10px", color: "red", fontSize: "10px" }}>
+        <FormHelperText
+          sx={{ ml: "0.625rem", color: "red", fontSize: "0.625rem" }}
+        >
           {helperText}
         </FormHelperText>
       )}
@@ -115,7 +121,7 @@ export const AutoCompleteSelectField = ({
   handleAddnewButton,
   optionList,
   error,
-  helperText
+  helperText,
 }) => {
   const [inpValue, setInpValue] = useState(value);
   const renderOption = (props, option) => {
@@ -123,14 +129,14 @@ export const AutoCompleteSelectField = ({
     //   return (
     //     <Box
     //       sx={{
-    //         gap: "8px",
+    //         gap: "0.5rem",
     //         display: "flex",
     //         justifyContent: "start",
     //         alignItems: "center",
-    //         padding: "10px 15px",
-    //         border: "1px solid #E5E5E5",
-    //         borderRadius: "2px",
-    //         mx: "10px",
+    //         padding: "0.625rem 0.938rem",
+    //         border: "0.063rem solid #E5E5E5",
+    //         borderRadius: "0.125rem",
+    //         mx: "0.625rem",
     //         cursor: "pointer",
     //       }}
     //     >
@@ -138,7 +144,7 @@ export const AutoCompleteSelectField = ({
     //         <Typography
     //           sx={{
     //             color: "#263032",
-    //             fontSize: "12px",
+    //             fontSize: "0.75rem",
     //             fontWeight: "400",
     //           }}
     //         >
@@ -153,24 +159,24 @@ export const AutoCompleteSelectField = ({
         <Box
           onClick={handleAddnewButton}
           sx={{
-            gap: "8px",
+            gap: "0.5rem",
             display: "flex",
             justifyContent: "start",
             alignItems: "center",
-            padding: "10px 15px",
-            border: "1px solid #E5E5E5",
-            borderRadius: "2px",
-            mx: "10px",
+            padding: "0.625rem 0.938rem",
+            border: "0.063rem solid #E5E5E5",
+            borderRadius: "0.125rem",
+            mx: "0.625rem",
             cursor: "pointer",
           }}
         >
           <Box
             sx={{
-              padding: "10px",
+              padding: "0.625rem",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              borderRadius: "6px",
+              borderRadius: "0.375rem",
               backgroundColor: "#EDEDF6",
             }}
           >
@@ -190,7 +196,7 @@ export const AutoCompleteSelectField = ({
           <Typography
             sx={{
               color: "#000080",
-              fontSize: "12px",
+              fontSize: "0.75rem",
               fontWeight: "500",
             }}
           >
@@ -202,14 +208,14 @@ export const AutoCompleteSelectField = ({
       return (
         <Box
           sx={{
-            gap: "8px",
+            gap: "0.5rem",
             display: "flex",
             justifyContent: "start",
             alignItems: "center",
-            padding: "10px 15px",
-            border: "1px solid #E5E5E5",
-            borderRadius: "2px",
-            mx: "10px",
+            padding: "0.625rem 0.938rem",
+            border: "0.063rem solid #E5E5E5",
+            borderRadius: "0.125rem",
+            mx: "0.625rem",
             cursor: "pointer",
           }}
         >
@@ -217,7 +223,7 @@ export const AutoCompleteSelectField = ({
             <Typography
               sx={{
                 color: "#263032",
-                fontSize: "12px",
+                fontSize: "0.75rem",
                 fontWeight: "400",
               }}
             >
@@ -275,24 +281,24 @@ export const AutoCompleteSelectField = ({
             sx={{
               color: "#707D89",
               background: "#ffffff",
-              borderRadius: "8px",
+              borderRadius: "0.5rem",
               overflow: "hidden",
               "& .MuiAutocomplete-input::placeholder": {
                 color: "#707D89 !important",
                 opacity: "1",
               },
               "& fieldset": {
-                border: "1px solid #EFEFEF !important",
-                borderRadius: "8px",
+                border: "0.063rem solid #EFEFEF !important",
+                borderRadius: "0.5rem",
               },
               "& .MuiAutocomplete-input": {
-                fontSize: "12px",
-                lineHeight: "20px",
+                fontSize: "0.75rem",
+                lineHeight: "1.25rem",
                 padding: "0 !important",
               },
               "& .MuiOutlinedInput-root": {
-                py: "11px",
-                px: "15px !important",
+                py: "0.688rem",
+                px: "0.938rem !important",
               },
             }}
           />
@@ -300,10 +306,15 @@ export const AutoCompleteSelectField = ({
         filterOptions={filterOptions}
       />
       {error && (
-        <FormHelperText sx={{ ml: "10px", color: "red", fontSize: "10px" }}>
+        <FormHelperText
+          sx={{ ml: "0.625rem", color: "red", fontSize: "0.625rem" }}
+        >
           {helperText}
         </FormHelperText>
       )}
     </div>
   );
 };
+
+
+// export 

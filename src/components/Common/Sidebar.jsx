@@ -52,11 +52,11 @@ function Sidebar() {
   ];
   return (
     <>
-      <Box sx={{ width: "80px", height: "100%" }}></Box>
+      <Box sx={{ width: "5rem", height: "100%" }}></Box>
       <Box
         sx={{
           backgroundColor: "#fff",
-          filter: "drop-shadow(2px 2px 10px #59667a8f)",
+          filter: "drop-shadow(0.125rem 0.125rem 0.625rem #59667a8f)",
           position: "absolute",
           left: "0",
           top: 0,
@@ -65,40 +65,50 @@ function Sidebar() {
       >
         <Box
           sx={{
-            width: "72px",
-            height: "66px",
+            width: "4.5rem",
+            height: "4.125rem",
+            "& img": {
+              width: "100%",
+              height: "100%",
+            },
+            cursor: "pointer",
           }}
+          onClick={()=>navigate("/")}
         >
           <img src="/Logo.png" alt="Logo image" />
         </Box>
         <Box
           sx={{
-            paddingRight: "11px",
+            paddingRight: "0.688rem",
             backgroundColor: "#fff",
-            maxHeight: "calc(100% - 66px)",
+            maxHeight: "calc(100% - 4.125rem)",
             overflowY: "scroll",
           }}
         >
           <Box
             sx={{
-              py: "19px",
+              py: "1.188rem",
               display: "flex",
               flexDirection: "column",
-              gap: "7px",
+              gap: "0.438rem",
             }}
           >
             {menus.map((item, i) => (
               <Box
                 key={i}
                 sx={{
-                  padding: "13px",
-                  pl: "33px",
+                  padding: "0.813rem",
+                  pl: "2.063rem",
                   background: i === 4 ? "rgba(0,0,128,0.1)" : "#fff",
-                  borderRadius: "0px 10px 10px 0px",
+                  borderRadius: "0rem 0.625rem 0.625rem 0rem",
                   cursor: "pointer",
+                  transition: "0.5s ease",
                   "&:hover": {
                     backgroundColor: "rgba(0,0,128,0.1)",
-                    transition:"0.5s ease"
+                  },
+                  "& svg": {
+                    width: "1.125rem",
+                    height: "1.125rem",
                   },
                 }}
                 // onClick={() => navigate(item.url)}

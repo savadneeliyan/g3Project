@@ -5,8 +5,11 @@
   font-family: "Poppins", sans-serif !important;
   font-style: normal;
   color: #263032;
+
 }
-body {
+
+body,html {
+  font-size: calc(100vw / 100) !important;
   background: #f8f8f8;
 }
 

@@ -13,18 +13,92 @@ import { Bounce, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { TemplateContext } from "../../Context/TemplateContext";
 import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  milstoneFindAction,
+  templateFindOneByIdAction,
+  templateTypeFindAction
+} from "../../../Redux/Action/ThemeAction";
 
 function EditTemplateMain() {
   const { id } = useParams();
-  const { templateData, setTemplateData } = useContext(TemplateContext);
+  const dispatch = useDispatch();
+  // const { templateData, setTemplateData } = useContext(TemplateContext);
   const navigate = useNavigate();
 
-  const modalRef = useRef();
+  // get template data
+  let { templateListFindByIdSuccess } = useSelector((state) => {
+    return state.findTemplateById;
+  });
+  // get milestone data
+  let { milestoneFindAllSuccess } = useSelector((state) => {
+    return state.listAllMileStone;
+  });
+  // get template types data
+  let { getTemplateTypeSuccess } = useSelector((state) => {
+    return state.TemplateTypeFind;
+  });
+
+  // states --------------------------------
+
+  const [formData, setFormData] = useState({
+    progressionColor: "#FFA500",
+    completedColor: "#008000",
+    delayedColor: "#FF0000",
+    milestones: [],
+  });
+  const [mileStonesListed, setMileStonesListed] = useState([]);
+  const [templateOptions, setTemplateOptions] = useState([]);
+  const [newMilstoneValue, setNewMilstoneValue] = useState();
+  const [tasks, setTasks] = useState({
+    milestoneName: "",
+    TaskName: "",
+  });
+  const [errorData, setErrorData] = useState({});
+  const [selectedTasks, setSelectedTasks] = useState({
+    milestoneName: "",
+    TaskName: [],
+  });
+
+  // set milestone data
   useEffect(() => {
-    let findItem = templateData.filter((item) => item.id == id);
-    setFormData(findItem[0])
-    console.log(templateData, "findItem");
-  }, [templateData]);
+    if (milestoneFindAllSuccess) {
+      let filteredArray = milestoneFindAllSuccess.map((item) => item.name);
+      setMileStonesListed(filteredArray);
+    }
+  }, [milestoneFindAllSuccess]);
+
+  // set milestone data
+  useEffect(() => {
+    if (getTemplateTypeSuccess) {
+      let filteredArray = getTemplateTypeSuccess.map(
+        (item) => item.template_name
+      );
+      setTemplateOptions(filteredArray);
+    }
+  }, [getTemplateTypeSuccess]);
+
+  // set template data
+  useEffect(() => {
+    if (templateListFindByIdSuccess) {
+      setFormData(templateListFindByIdSuccess);
+      dispatch(milstoneFindAction(templateListFindByIdSuccess[0]?.company_id));
+      dispatch(
+        templateTypeFindAction(templateListFindByIdSuccess[0]?.company_id)
+      );
+    }
+  }, [templateListFindByIdSuccess]);
+
+  useEffect(() => {
+    dispatch(templateFindOneByIdAction(id));
+  }, []);
+
+  const modalRef = useRef();
+  // useEffect(() => {
+  //   let findItem = templateData.filter((item) => item.id == id);
+  //   setFormData(findItem[0]);
+  //   // console.log(templateData, "findItem");
+  // }, [templateData]);
 
   // dropdown lists --------------------------------
   let array = [
@@ -38,38 +112,19 @@ function EditTemplateMain() {
     "customButton",
   ];
 
-  let templateOptions = [
-    "template 1",
-    "template 2",
-    "template 3",
-    "template 4",
-    "template 5",
-    "template 6",
-    "template 7",
-    "template 8",
-    "template 9",
-  ];
+  // let templateOptions = [
+  //   "installation",
+  //   "crane",
+  //   "template 3",
+  //   "template 4",
+  //   "template 5",
+  //   "template 6",
+  //   "template 7",
+  //   "template 8",
+  //   "template 9",
+  // ];
 
-  // states --------------------------------
-
-  const [formData, setFormData] = useState({
-    progressionColor: "#FFA500",
-    completedColor: "#008000",
-    delayedColor: "#FF0000",
-    milestones: [],
-  });
-  const [mileStonesListed, setMileStonesListed] = useState(array);
-  const [newMilstoneValue, setNewMilstoneValue] = useState();
-  const [tasks, setTasks] = useState({
-    milestoneName: "",
-    TaskName: "",
-  });
-  const [errorData, setErrorData] = useState({});
-  const [selectedTasks, setSelectedTasks] = useState({
-    milestoneName: "",
-    TaskName: [],
-  });
-
+  // console.log(formData,"azshkjbsa")
   // for seting formdata on input change --------------------------------
   const handleChange = (e) => {
     const { value, name } = e.target;
@@ -84,7 +139,7 @@ function EditTemplateMain() {
     modalRef.current.open();
   };
   const handleModalClose = () => {
-    setNewMilstoneValue("")
+    setNewMilstoneValue("");
     modalRef.current.close();
   };
 
@@ -122,6 +177,17 @@ function EditTemplateMain() {
         TaskName: "",
       }));
     }
+  };
+
+  // delete
+  const handelAddedTask = (idx) => {
+    let newArray = selectedTasks.TaskName.filter(
+      (task, index) => index !== idx
+    );
+    setSelectedTasks((prev) => ({
+      ...prev,
+      ["TaskName"]: newArray,
+    }));
   };
 
   // add milestones operations --------------------------------
@@ -164,6 +230,15 @@ function EditTemplateMain() {
     }
   };
 
+  const deleteSelectedMilestone = (idx) => {
+    console.log(formData.milestones);
+    let newArray = formData.milestones.filter((task, index) => index !== idx);
+    setFormData((prev) => ({
+      ...prev,
+      ["milestones"]: newArray,
+    }));
+  };
+
   // validations operations --------------------------------
 
   const MileStoneValidate = () => {
@@ -187,7 +262,7 @@ function EditTemplateMain() {
       validate = false;
     }
 
-    console.log(errors, "errors");
+    // console.log(errors, "errors");
     setErrorData(errors);
     return validate;
   };
@@ -206,7 +281,7 @@ function EditTemplateMain() {
       validate = false;
     }
 
-    console.log(errors, "errors");
+    // console.log(errors, "errors");
     setErrorData(errors);
     return validate;
   };
@@ -226,19 +301,10 @@ function EditTemplateMain() {
     }
 
     if (formData.milestones.length === 0) {
-      errors.milestones = "Please enter atleast one milestone";
+      errors.selectedTasksTaskName = "Please enter atleast one milestone";
       validate = false;
     }
 
-    if (!tasks.milestoneName.trim()) {
-      errors.milestoneName = "Milestone name is required";
-      validate = false;
-    }
-
-    if (!tasks.TaskName.trim()) {
-      errors.TaskName = "Task name is required";
-      validate = false;
-    }
     setErrorData(errors);
     return validate;
   };
@@ -263,12 +329,11 @@ function EditTemplateMain() {
         id: randomNumber,
         ...formData,
       };
-      console.log(formData);
+      // console.log(formData);
       setTemplateData((prev) => [...prev, data]);
       navigate("/");
     }
   };
-
 
   return (
     <>
@@ -279,13 +344,13 @@ function EditTemplateMain() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "20px 30px",
-            borderBottom: "1px solid #E5E5E5",
+            padding: "1.25rem 1.875rem",
+            borderBottom: "0.063rem solid #E5E5E5",
           }}
         >
           <Typography
             sx={{
-              fontSize: "18px",
+              fontSize: "1.125rem",
               fontWeight: "500",
               fontFamily: "poppins",
             }}
@@ -297,27 +362,27 @@ function EditTemplateMain() {
             onClick={handleModalClose}
             sx={{
               cursor: "pointer",
-              padding: "7px",
-              borderRadius: "6px",
+              padding: "0.438rem",
+              borderRadius: "0.375rem",
               background: "rgba(196,196,196,0.31)",
               display: "fit-content",
-              fontSize: "28px",
+              fontSize: "1.75rem",
             }}
           />
         </Box>
         <Box
           component={"form"}
           sx={{
-            pt: "30px",
-            pb: "50px",
-            px: "30px",
+            pt: "1.875rem",
+            pb: "3.125rem",
+            px: "1.875rem",
           }}
         >
           <Typography
             sx={{
-              fontSize: "12px",
+              fontSize: "0.75rem",
               fontWeight: "500",
-              mb: "8px",
+              mb: "0.5rem",
               "& span": {
                 color: "#FF0000",
               },
@@ -337,26 +402,26 @@ function EditTemplateMain() {
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              mt: "30px",
+              mt: "1.875rem",
             }}
           >
             <Button
               onClick={handleModalClose}
               sx={{
                 background: "#fff",
-                fontSize: "12px",
+                fontSize: "0.75rem",
                 color: "#263032",
-                border: "1px solid #E8E9EB",
+                border: "0.063rem solid #E8E9EB",
                 transition: "0.5s ease",
-                height: "40px",
+                height: "2.5rem",
                 width: "fit-content",
-                paddingX: "32px",
-                borderRadius: "8px",
+                paddingX: "2rem",
+                borderRadius: "0.5rem",
                 textTransform: "capitalize",
                 "&:hover": {
                   background: "#000080",
                   color: "#fff",
-                  border: "1px solid rgba(0,0,128,0.4)",
+                  border: "0.063rem solid rgba(0,0,128,0.4)",
                 },
               }}
             >
@@ -367,19 +432,19 @@ function EditTemplateMain() {
               type="submit"
               sx={{
                 background: "#000080",
-                fontSize: "12px",
+                fontSize: "0.75rem",
                 color: "#fff",
-                border: "1px solid rgba(0,0,128,0.4)",
+                border: "0.063rem solid rgba(0,0,128,0.4)",
                 transition: "0.5s ease",
-                height: "40px",
+                height: "2.5rem",
                 width: "fit-content",
-                paddingX: "32px",
-                borderRadius: "8px",
+                paddingX: "2rem",
+                borderRadius: "0.5rem",
                 textTransform: "capitalize",
                 "&:hover": {
                   background: "#fff",
                   color: "#263032",
-                  border: "1px solid #E8E9EB",
+                  border: "0.063rem solid #E8E9EB",
                 },
               }}
             >
@@ -391,22 +456,22 @@ function EditTemplateMain() {
 
       <Box
         sx={{
-          maxHeight: "calc(100vh - 66px)",
+          maxHeight: "calc(100vh - 4.125rem)",
           overflowY: "scroll",
-          width: "calc(100vw - 77px)",
+          width: "calc(100vw - 4.813rem)",
         }}
       >
         <Box
           sx={{
-            px: "15px",
+            px: "0.938rem",
             width: "100%",
           }}
         >
           <Typography
             sx={{
-              mt: "40px",
-              mb: "25px",
-              fontSize: "16px",
+              mt: "2.5rem",
+              mb: "1.563rem",
+              fontSize: "1rem",
               fontWeight: "500",
             }}
           >
@@ -414,9 +479,9 @@ function EditTemplateMain() {
           </Typography>
           <Box
             sx={{
-              padding: "40px",
-              pb: "20px",
-              borderRadius: "6px",
+              padding: "2.5rem",
+              pb: "1.25rem",
+              borderRadius: "0.375rem",
               backgroundColor: "#fff",
             }}
           >
@@ -424,15 +489,15 @@ function EditTemplateMain() {
               sx={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr ",
-                gap: "20px",
+                gap: "1.25rem",
               }}
             >
               <Box>
                 <Typography
                   sx={{
                     color: "#263032",
-                    fontSize: "12px",
-                    mb: "10px",
+                    fontSize: "0.75rem",
+                    mb: "0.625rem",
                     "& span": {
                       color: "#FF0000",
                     },
@@ -440,6 +505,7 @@ function EditTemplateMain() {
                 >
                   Template type <span>*</span>
                 </Typography>
+                {/* {formData?.templateType && ( */}
                 <SelectFieldWithLabel
                   label={"Select"}
                   handleChange={handleChange}
@@ -449,14 +515,15 @@ function EditTemplateMain() {
                   helperText={errorData?.templateType}
                   value={formData?.templateType}
                 />
+                {/* )} */}
               </Box>
 
               <Box sx={{}}>
                 <Typography
                   sx={{
                     color: "#263032",
-                    fontSize: "12px",
-                    mb: "10px",
+                    fontSize: "0.75rem",
+                    mb: "0.625rem",
                     "& span": {
                       color: "#FF0000",
                     },
@@ -478,10 +545,10 @@ function EditTemplateMain() {
             <Typography
               sx={{
                 color: "#263032",
-                fontSize: "14px",
+                fontSize: "0.875rem",
                 fontWeight: "500",
-                mt: "20px",
-                mb: "16px",
+                mt: "1.25rem",
+                mb: "1rem",
               }}
             >
               Colours
@@ -490,7 +557,7 @@ function EditTemplateMain() {
               sx={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr 1fr",
-                gap: "20px",
+                gap: "1.25rem",
               }}
             >
               <ColorPicker
@@ -518,9 +585,9 @@ function EditTemplateMain() {
             {/* milestones */}
             <Box
               sx={{
-                padding: "20px",
+                padding: "1.25rem",
                 background: "#F7F7F7",
-                mt: "20px",
+                mt: "1.25rem",
               }}
             >
               <Box
@@ -534,17 +601,17 @@ function EditTemplateMain() {
                   sx={{
                     display: "grid",
                     gridTemplateColumns: "1fr 1fr",
-                    gap: "20px",
-                    maxWidth: "calc(100% - 200px)",
+                    gap: "1.25rem",
+                    maxWidth: "calc(100% - 12.5rem)",
                     width: "100%",
                   }}
                 >
                   <Box>
                     <Typography
                       sx={{
-                        fontSize: "12px",
+                        fontSize: "0.75rem",
                         color: "#263032",
-                        mb: "8px",
+                        mb: "0.5rem",
                         "& span": {
                           color: "#FF0000",
                         },
@@ -566,9 +633,9 @@ function EditTemplateMain() {
                   <Box>
                     <Typography
                       sx={{
-                        fontSize: "12px",
+                        fontSize: "0.75rem",
                         color: "#263032",
-                        mb: "8px",
+                        mb: "0.5rem",
                         "& span": {
                           color: "#FF0000",
                         },
@@ -591,16 +658,16 @@ function EditTemplateMain() {
                   onClick={handleSelectedTasks}
                   sx={{
                     background: "rgba(0,0,128,0.6)",
-                    fontSize: "12px",
+                    fontSize: "0.75rem",
                     color: "#fff",
-                    border: "1px solid #F7F7F7",
+                    border: "0.063rem solid #F7F7F7",
                     transition: "0.5s ease",
-                    height: "40px",
-                    width: "118px",
+                    height: "2.5rem",
+                    width: "7.375rem",
                     "&:hover": {
                       background: "#ffff",
                       color: "rgba(0,0,128,0.4)",
-                      border: "1px solid rgba(0,0,128,0.4)",
+                      border: "0.063rem solid rgba(0,0,128,0.4)",
                     },
                   }}
                 >
@@ -609,25 +676,25 @@ function EditTemplateMain() {
               </Box>
               <Box
                 sx={{
-                  maxWidth: "calc(100% - 200px)",
-                  mt: "20px",
+                  maxWidth: "calc(100% - 12.5rem)",
+                  mt: "1.25rem",
                   display: "grid",
-                  gap: "5px",
+                  gap: "0.313rem",
                 }}
               >
                 {selectedTasks?.TaskName?.map((tsk, idx) => (
                   <Box
                     sx={{
-                      border: "1px solid #EFEFEF",
+                      border: "0.063rem solid #EFEFEF",
                       bgcolor: "#fff",
-                      borderRadius: "4px",
-                      padding: "10px 8px",
-                      pr: "16px",
-                      mx: "16px",
+                      borderRadius: "0.25rem",
+                      padding: "0.625rem 0.5rem",
+                      pr: "1rem",
+                      mx: "1rem",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      gap: "20px",
+                      gap: "1.25rem",
                     }}
                   >
                     <Box
@@ -635,17 +702,17 @@ function EditTemplateMain() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
-                        gap: "8px",
+                        gap: "0.5rem",
                       }}
                     >
                       <Box
                         sx={{
-                          width: "30px",
-                          height: "30px",
-                          borderRadius: "7px",
+                          width: "1.875rem",
+                          height: "1.875rem",
+                          borderRadius: "0.438rem",
                           color: "#fff",
                           bgcolor: "#000080",
-                          fontSize: "12px",
+                          fontSize: "0.75rem",
                           fontWeight: "500",
                           display: "flex",
                           alignItems: "center",
@@ -656,9 +723,9 @@ function EditTemplateMain() {
                       </Box>
                       <Typography
                         sx={{
-                          fontSize: "12px",
+                          fontSize: "0.75rem",
                           color: "#263032",
-                          lineHeight: "18px",
+                          lineHeight: "1.125rem",
                         }}
                       >
                         {tsk}
@@ -668,10 +735,15 @@ function EditTemplateMain() {
                       sx={{
                         display: "flex",
                         alignItems: "center",
-                        gap: "8px",
+                        gap: "0.5rem",
+                        "& svg": {
+                          width: "0.625rem",
+                          height: "0.625rem",
+                          cursor: "pointer",
+                        },
                       }}
                     >
-                      <DeleteIcon />
+                      <DeleteIcon handleClick={() => handelAddedTask(idx)} />
                       <EditIcon />
                       <ViewIcon />
                     </Box>
@@ -681,15 +753,15 @@ function EditTemplateMain() {
             </Box>
             {errorData?.selectedTasksTaskName && (
               <FormHelperText
-                sx={{ ml: "10px", color: "red", fontSize: "10px" }}
+                sx={{ ml: "0.625rem", color: "red", fontSize: "0.625rem" }}
               >
                 {errorData.selectedTasksTaskName}
               </FormHelperText>
             )}
             <Box
               sx={{
-                pb: "40px",
-                borderBottom: "1px solid #E5E5E5",
+                pb: "2.5rem",
+                borderBottom: "0.063rem solid #E5E5E5",
               }}
             >
               <Box
@@ -700,22 +772,22 @@ function EditTemplateMain() {
                 <Button
                   sx={{
                     background: "#fff",
-                    fontSize: "12px",
+                    fontSize: "0.75rem",
                     color: "#000080",
-                    border: "1px solid #000080",
+                    border: "0.063rem solid #000080",
                     transition: "0.5s ease",
-                    height: "40px",
+                    height: "2.5rem",
                     width: "fit-content",
-                    paddingX: "32px",
-                    borderRadius: "8px",
-                    mt: "16px",
+                    paddingX: "2rem",
+                    borderRadius: "0.5rem",
+                    mt: "1rem",
                     marginRight: "0",
                     ml: "auto",
                     textTransform: "capitalize",
                     "&:hover": {
                       background: "#000080",
                       color: "#fff",
-                      border: "1px solid rgba(0,0,128,0.4)",
+                      border: "0.063rem solid rgba(0,0,128,0.4)",
                     },
                   }}
                   onClick={handleAddMileStones}
@@ -723,15 +795,23 @@ function EditTemplateMain() {
                   Save/Add new milestone
                 </Button>
               </Box>
-              <Box sx={{ mt: "16px", display: "grid", gap: "10px" }}>
+              <Box
+                sx={{
+                  mt: "1rem",
+                  display: "flex",
+                  flexDirection: "column-reverse",
+                  gap: "0.625rem",
+                }}
+              >
                 {formData?.milestones?.map((mstn, i) => (
                   <Box
                     key={i}
                     sx={{
                       backgroundColor: "#fff",
-                      filter: "drop-shadow(2px 2px 10px #59667a8f)",
-                      padding: "16px 20px 20px",
-                      borderRadius: "8px",
+                      filter:
+                        "drop-shadow(0.125rem 0.125rem 0.625rem #59667a8f)",
+                      padding: "1rem 1.25rem 1.25rem",
+                      borderRadius: "0.5rem",
                     }}
                   >
                     <Box
@@ -739,38 +819,46 @@ function EditTemplateMain() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "end",
-                        gap: "12px",
+                        gap: "0.75rem",
+                        "& svg": {
+                          width: "0.5rem",
+                          height: "0.5rem",
+                        },
                       }}
                     >
-                      <DeleteIcon />
+                      <DeleteIcon
+                        handleClick={() => deleteSelectedMilestone(i)}
+                      />
                       <EditIcon />
                     </Box>
                     <Box
                       sx={{
                         display: "flex",
                         alignItems: "center",
-                        gap: "8px",
+                        gap: "0.5rem",
                       }}
                     >
-                      <Typography sx={{ fontSize: "12px", lineHeight: "18px" }}>
+                      <Typography
+                        sx={{ fontSize: "0.75rem", lineHeight: "1.125rem" }}
+                      >
                         Milestone name :
                       </Typography>
                       <Button
                         sx={{
                           background: "#fff",
-                          fontSize: "12px",
+                          fontSize: "0.75rem",
                           color: "#000080",
-                          border: "1px solid #000080",
+                          border: "0.063rem solid #000080",
                           transition: "0.5s ease",
-                          height: "27px",
+                          height: "1.688rem",
                           width: "fit-content",
-                          padding: "4px 10px ",
-                          borderRadius: "8px",
+                          padding: "0.25rem 0.625rem ",
+                          borderRadius: "0.5rem",
                           textTransform: "capitalize",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          gap: "4px",
+                          gap: "0.25rem",
                           "& svg path": {
                             transition: "0.5s ease",
                           },
@@ -780,7 +868,11 @@ function EditTemplateMain() {
                           "&:hover": {
                             background: "#000080",
                             color: "#fff",
-                            border: "1px solid rgba(0,0,128,0.4)",
+                            border: "0.063rem solid rgba(0,0,128,0.4)",
+                          },
+                          "& svg": {
+                            width: "0.438rem",
+                            height: "0.438rem",
                           },
                         }}
                       >
@@ -788,7 +880,9 @@ function EditTemplateMain() {
                       </Button>
                     </Box>
                     <Box>
-                      <Typography sx={{ fontSize: "12px", lineHeight: "18px" }}>
+                      <Typography
+                        sx={{ fontSize: "0.75rem", lineHeight: "1.125rem" }}
+                      >
                         Tasks :{" "}
                       </Typography>
                       <Box>
@@ -799,28 +893,28 @@ function EditTemplateMain() {
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "space-between",
-                              gap: "8px",
-                              pt: "8px",
+                              gap: "0.5rem",
+                              pt: "0.5rem",
                             }}
                           >
                             <Box
                               sx={{
-                                padding: "4px",
+                                padding: "0.25rem",
                                 backgroundColor: "#F3F5F6",
-                                borderRadius: "6px",
+                                borderRadius: "0.375rem",
                                 display: "flex",
                                 alignItems: "center",
-                                gap: "4px",
+                                gap: "0.25rem",
                               }}
                             >
                               <Box
                                 sx={{
-                                  width: "30px",
-                                  height: "30px",
+                                  width: "1.875rem",
+                                  height: "1.875rem",
                                   borderRadius: "50%",
                                   color: "#fff",
                                   bgcolor: "#000080",
-                                  fontSize: "12px",
+                                  fontSize: "0.75rem",
                                   fontWeight: "500",
                                   display: "flex",
                                   alignItems: "center",
@@ -831,9 +925,9 @@ function EditTemplateMain() {
                               </Box>
                               <Typography
                                 sx={{
-                                  fontSize: "12px",
+                                  fontSize: "0.75rem",
                                   color: "#263032",
-                                  lineHeight: "18px",
+                                  lineHeight: "1.125rem",
                                 }}
                               >
                                 {tsk}
@@ -853,27 +947,27 @@ function EditTemplateMain() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                mt: "20px",
-                mb: "30px",
+                mt: "1.25rem",
+                mb: "1.875rem",
               }}
             >
               <Button
                 onClick={cancelForm}
                 sx={{
                   background: "#fff",
-                  fontSize: "12px",
+                  fontSize: "0.75rem",
                   color: "#263032",
-                  border: "1px solid #E8E9EB",
+                  border: "0.063rem solid #E8E9EB",
                   transition: "0.5s ease",
-                  height: "40px",
+                  height: "2.5rem",
                   width: "fit-content",
-                  paddingX: "32px",
-                  borderRadius: "8px",
+                  paddingX: "2rem",
+                  borderRadius: "0.5rem",
                   textTransform: "capitalize",
                   "&:hover": {
                     background: "#000080",
                     color: "#fff",
-                    border: "1px solid rgba(0,0,128,0.4)",
+                    border: "0.063rem solid rgba(0,0,128,0.4)",
                   },
                 }}
               >
@@ -882,19 +976,19 @@ function EditTemplateMain() {
               <Button
                 sx={{
                   background: "#000080",
-                  fontSize: "12px",
+                  fontSize: "0.75rem",
                   color: "#fff",
-                  border: "1px solid rgba(0,0,128,0.4)",
+                  border: "0.063rem solid rgba(0,0,128,0.4)",
                   transition: "0.5s ease",
-                  height: "40px",
+                  height: "2.5rem",
                   width: "fit-content",
-                  paddingX: "32px",
-                  borderRadius: "8px",
+                  paddingX: "2rem",
+                  borderRadius: "0.5rem",
                   textTransform: "capitalize",
                   "&:hover": {
                     background: "#fff",
                     color: "#263032",
-                    border: "1px solid #E8E9EB",
+                    border: "0.063rem solid #E8E9EB",
                   },
                 }}
                 onClick={submitForm}

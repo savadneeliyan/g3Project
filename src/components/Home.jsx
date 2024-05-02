@@ -6,17 +6,17 @@ function Home() {
   return (
     <Box
       sx={{
-        height: "calc(100vh - 66px)",
-        width: "calc(100vw - 77px)"
+        height: "calc(100vh - 4.125rem)",
+        width: "calc(100vw - 4.813rem)",
       }}
     >
       <Box
         sx={{
-          px: "15px",
-          width:"100%",
+          px: "0.938rem",
+          width: "100%",
         }}
       >
-        <TemplatesMain/>
+        <TemplatesMain />
       </Box>
     </Box>
   );
