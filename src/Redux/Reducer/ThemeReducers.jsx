@@ -1,5 +1,45 @@
+import {
+  GET_COLOR_ERR,
+  GET_COLOR_REQUEST,
+  GET_COLOR_SUCCESS,
+  GET_MILESTONE_FIND_ERR,
+  GET_MILESTONE_FIND_REQUEST,
+  GET_MILESTONE_FIND_SUCCESS,
+  GET_TEMPLATE_TYPE_ERR,
+  GET_TEMPLATE_TYPE_REQUEST,
+  GET_TEMPLATE_TYPE_SUCCESS,
+  TEMPLATE_LIST_FIND_BY_ID_ERR,
+  TEMPLATE_LIST_FIND_BY_ID_REQUEST,
+  TEMPLATE_LIST_FIND_BY_ID_SUCCESS,
+  TEMPLATE_LIST_FIND_ERR,
+  TEMPLATE_LIST_FIND_REQUEST,
+  TEMPLATE_LIST_FIND_SUCCESS,
+} from "../Constants/ThemeConstants";
 
-import { GET_TEMPLATE_TYPE_ERR, GET_TEMPLATE_TYPE_REQUEST, GET_TEMPLATE_TYPE_SUCCESS, LIST_ALL_MILESTONE_ERR, LIST_ALL_MILESTONE_REQUEST, LIST_ALL_MILESTONE_SUCCESS, TEMPLATE_LIST_FIND_BY_ID_ERR, TEMPLATE_LIST_FIND_BY_ID_REQUEST, TEMPLATE_LIST_FIND_BY_ID_SUCCESS, TEMPLATE_LIST_FIND_ERR, TEMPLATE_LIST_FIND_REQUEST, TEMPLATE_LIST_FIND_SUCCESS } from "../Constants/ThemeConstants";
+// get all milestone
+export const getMileStoneReducer = (state = {}, action) => {
+  switch (action.type) {
+    case GET_MILESTONE_FIND_REQUEST:
+      return {
+        ...state,
+        milestoneFindAllLoading: true,
+      };
+    case GET_MILESTONE_FIND_SUCCESS:
+      return {
+        ...state,
+        milestoneFindAllLoading: false,
+        milestoneFindAllSuccess: action.payload,
+      };
+    case GET_MILESTONE_FIND_ERR:
+      return {
+        ...state,
+        milestoneFindAllLoading: false,
+        milestoneFindAllErr: action.payload,
+      };
+    default:
+      return state;
+  }
+};
 
 // find all template reducer
 export const findTemplateListReducer = (state = {}, action) => {
@@ -51,31 +91,6 @@ export const findTemplateByIdReducer = (state = {}, action) => {
   }
 };
 
-// list all milestone reducer
-export const listAllMileStoneReducer = (state = {}, action) => {
-  switch (action.type) {
-    case LIST_ALL_MILESTONE_REQUEST:
-      return {
-        ...state,
-        milestoneFindAllLoading: true,
-      };
-    case LIST_ALL_MILESTONE_SUCCESS:
-      return {
-        ...state,
-        milestoneFindAllLoading: false,
-        milestoneFindAllSuccess: action.payload,
-      };
-    case LIST_ALL_MILESTONE_ERR:
-      return {
-        ...state,
-        milestoneFindAllLoading: false,
-        milestoneFindAllErr: action.payload,
-      };
-    default:
-      return state;
-  }
-};
-
 // template type reducer
 export const TemplateTypeFindReducer = (state = {}, action) => {
   switch (action.type) {
@@ -95,6 +110,31 @@ export const TemplateTypeFindReducer = (state = {}, action) => {
         ...state,
         getTemplateTypeLoading: false,
         getTemplateTypeErr: action.payload,
+      };
+    default:
+      return state;
+  }
+};
+
+// get color reducer
+export const getColorReducer = (state = {}, action) => {
+  switch (action.type) {
+    case GET_COLOR_REQUEST:
+      return {
+        ...state,
+        getColorLoading: true,
+      };
+    case GET_COLOR_SUCCESS:
+      return {
+        ...state,
+        getColorLoading: false,
+        getColorSuccess: action.payload,
+      };
+    case GET_COLOR_ERR:
+      return {
+        ...state,
+        getColorLoading: false,
+        getColorErr: action.payload,
       };
     default:
       return state;

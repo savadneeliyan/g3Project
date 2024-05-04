@@ -1,4 +1,36 @@
-import { FormHelperText, OutlinedInput } from "@mui/material";
+import { FormHelperText, OutlinedInput, TextField } from "@mui/material";
+
+export const TextFieldWithLabel = ({
+  value,
+  handleChange,
+  error,
+  helperText,
+  label,
+  type,
+  name
+}) => {
+  return (
+    <TextField
+      label={label}
+      id="outlined-basic"
+      error={error}
+      value={value}
+      name={name}
+      helperText={helperText}
+      onChange={handleChange}
+      type={type ? type : "text"}
+      sx={{
+        width: "100%",
+        fontSize: "0.75rem",
+        fontWeight: "500",
+        mb: "0.5rem",
+        "& span": {
+          color: "#FF0000",
+        },
+      }}
+    />
+  );
+};
 
 export const NormalTextField = ({
   placeholder,
@@ -12,6 +44,7 @@ export const NormalTextField = ({
   return (
     <div>
       <OutlinedInput
+        
         sx={{
           width: "100%",
           backgroundColor: "#fff",

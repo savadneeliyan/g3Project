@@ -4,15 +4,17 @@ import thunk from "redux-thunk";
 import {
   findTemplateByIdReducer,
   findTemplateListReducer,
-  listAllMileStoneReducer,
+  getColorReducer,
+  getMileStoneReducer,
   TemplateTypeFindReducer,
 } from "./Redux/Reducer/ThemeReducers";
 
 const appReducer = combineReducers({
   findTemplateList: findTemplateListReducer,
   findTemplateById: findTemplateByIdReducer,
-  listAllMileStone: listAllMileStoneReducer,
   TemplateTypeFind: TemplateTypeFindReducer,
+  getMileStone: getMileStoneReducer,
+  getColor: getColorReducer,
 });
 
 let Middleware = [thunk];

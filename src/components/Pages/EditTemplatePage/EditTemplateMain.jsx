@@ -15,10 +15,10 @@ import { TemplateContext } from "../../Context/TemplateContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  milstoneFindAction,
   templateFindOneByIdAction,
-  templateTypeFindAction
+  templateTypeFindAction,
 } from "../../../Redux/Action/ThemeAction";
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 
 function EditTemplateMain() {
   const { id } = useParams();
@@ -31,9 +31,7 @@ function EditTemplateMain() {
     return state.findTemplateById;
   });
   // get milestone data
-  let { milestoneFindAllSuccess } = useSelector((state) => {
-    return state.listAllMileStone;
-  });
+
   // get template types data
   let { getTemplateTypeSuccess } = useSelector((state) => {
     return state.TemplateTypeFind;
@@ -61,12 +59,12 @@ function EditTemplateMain() {
   });
 
   // set milestone data
-  useEffect(() => {
-    if (milestoneFindAllSuccess) {
-      let filteredArray = milestoneFindAllSuccess.map((item) => item.name);
-      setMileStonesListed(filteredArray);
-    }
-  }, [milestoneFindAllSuccess]);
+  // useEffect(() => {
+  //   if (milestoneFindAllSuccess) {
+  //     let filteredArray = milestoneFindAllSuccess.map((item) => item.name);
+  //     setMileStonesListed(filteredArray);
+  //   }
+  // }, [milestoneFindAllSuccess]);
 
   // set milestone data
   useEffect(() => {
@@ -82,7 +80,7 @@ function EditTemplateMain() {
   useEffect(() => {
     if (templateListFindByIdSuccess) {
       setFormData(templateListFindByIdSuccess);
-      dispatch(milstoneFindAction(templateListFindByIdSuccess[0]?.company_id));
+      //  dispatch(milstoneFindAction(templateListFindByIdSuccess[0]?.company_id));
       dispatch(
         templateTypeFindAction(templateListFindByIdSuccess[0]?.company_id)
       );
@@ -467,16 +465,25 @@ function EditTemplateMain() {
             width: "100%",
           }}
         >
-          <Typography
+          <Box
             sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.625rem",
               mt: "2.5rem",
               mb: "1.563rem",
-              fontSize: "1rem",
-              fontWeight: "500",
             }}
           >
-            Add templates
-          </Typography>
+            <KeyboardBackspaceIcon onClick={() => navigate("/")} sx={{cursor:"pointer"}} />
+            <Typography
+              sx={{
+                fontSize: "1rem",
+                fontWeight: "500",
+              }}
+            >
+              Edit Templates
+            </Typography>
+          </Box>
           <Box
             sx={{
               padding: "2.5rem",

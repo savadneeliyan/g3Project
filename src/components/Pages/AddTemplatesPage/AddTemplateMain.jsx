@@ -2,6 +2,7 @@ import { Box, Button, FormHelperText, Typography } from "@mui/material";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   AutoCompleteSelectField,
+  MilestoneInput,
   SelectFieldWithLabel,
 } from "../../InputFields/SelectInputFields";
 import ColorPicker from "../../InputFields/ColorPicker";
@@ -13,12 +14,64 @@ import { Bounce, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { TemplateContext } from "../../Context/TemplateContext";
 import { useNavigate } from "react-router-dom";
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  milestoneFindAllAction,
+  getColorAction,
+  templateTypeFindAction,
+} from "../../../Redux/Action/ThemeAction";
 
 function AddTemplateMain() {
   const { templateData, setTemplateData } = useContext(TemplateContext);
   const navigate = useNavigate();
-
   const modalRef = useRef();
+  const dispatch = useDispatch();
+
+  // get milestone data
+  let { milestoneFindAllSuccess } = useSelector((state) => {
+    return state.getMileStone;
+  });
+
+  // get template type data
+  let { getTemplateTypeSuccess } = useSelector((state) => {
+    return state.TemplateTypeFind;
+  });
+
+  // get template type data
+  let { getColorSuccess } = useSelector((state) => {
+    return state.getColor;
+  });
+
+  useEffect(() => {
+    dispatch(milestoneFindAllAction());
+    dispatch(templateTypeFindAction());
+    dispatch(getColorAction());
+  }, []);
+
+  // milestone
+  useEffect(() => {
+    if (milestoneFindAllSuccess) {
+      setMileStonesListed(milestoneFindAllSuccess);
+    }
+  }, [milestoneFindAllSuccess]);
+
+  // template type
+  useEffect(() => {
+    if (getTemplateTypeSuccess) {
+      setTemplateOption(getTemplateTypeSuccess);
+    }
+  }, [getTemplateTypeSuccess]);
+
+  // color
+  useEffect(() => {
+    if (getColorSuccess) {
+      setFormData((prev) => ({
+        ...prev,
+        ["colour"]: getColorSuccess,
+      }));
+    }
+  }, [getColorSuccess]);
 
   // dropdown lists --------------------------------
   let array = [
@@ -32,44 +85,52 @@ function AddTemplateMain() {
     "customButton",
   ];
 
-  let templateOptions = [
-    "template 1",
-    "template 2",
-    "template 3",
-    "template 4",
-    "template 5",
-    "template 6",
-    "template 7",
-    "template 8",
-    "template 9",
-  ];
+  let [templateOptions, setTemplateOption] = useState([]);
 
   // states --------------------------------
 
   const [formData, setFormData] = useState({
-    progressionColor: "#FFA500",
-    completedColor: "#008000",
-    delayedColor: "#FF0000",
+    colour: [],
     milestones: [],
   });
-  const [mileStonesListed, setMileStonesListed] = useState(array);
+  // milestone states --------------------------------
+  const [mileStonesListed, setMileStonesListed] = useState([]);
   const [newMilstoneValue, setNewMilstoneValue] = useState();
   const [tasks, setTasks] = useState({
-    milestoneName: "",
+    milestoneName: {},
     TaskName: "",
   });
   const [errorData, setErrorData] = useState({});
   const [selectedTasks, setSelectedTasks] = useState({
-    milestoneName: "",
+    milestoneName: {},
     TaskName: [],
   });
 
   // for seting formdata on input change --------------------------------
-  const handleChange = (e) => {
+  const handleColorChange = (e, id) => {
     const { value, name } = e.target;
     setFormData((prev) => ({
       ...prev,
+      colour: prev.colour.map((item) =>
+        item.id === id ? { ...item, color: value } : item
+      ),
+    }));
+    setErrorData((prev) => ({
+      ...prev,
+      [name]: ""
+    }));
+  };
+
+  const handleChange = (e) => {
+    const { value, name } = e.target;
+    // console.log(name);
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
+    }));
+    setErrorData((prev) => ({
+      ...prev,
+      [name]: "",
     }));
   };
 
@@ -85,22 +146,27 @@ function AddTemplateMain() {
 
   const handleTaskChanges = (e) => {
     const { value, name } = e.target;
-    if (name === "milestoneName") {
-      setTasks(() => ({
-        [name]: value,
-        TaskName: "",
-      }));
+    setTasks((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-      setSelectedTasks({
-        milestoneName: "",
-        TaskName: [],
-      });
-    } else {
-      setTasks((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
+  const handleTaskMilestoneChanges = (value) => {
+    // console.log(value);
+    setTasks(() => ({
+      ["milestoneName"]: value,
+      TaskName: "",
+    }));
+    setErrorData((prev) => ({
+      ...prev,
+      ["milestoneName"]: "",
+    }));
+
+    setSelectedTasks({
+      milestoneName: {},
+      TaskName: [],
+    });
   };
 
   const handleSelectedTasks = () => {
@@ -117,7 +183,6 @@ function AddTemplateMain() {
     }
   };
 
-  // delete
   const handelAddedTask = (idx) => {
     let newArray = selectedTasks.TaskName.filter(
       (task, index) => index !== idx
@@ -136,9 +201,9 @@ function AddTemplateMain() {
         ...prev,
         milestones: [...prev.milestones, selectedTasks],
       }));
-      setTasks({ milestoneName: "", TaskName: "" });
+      setTasks({ milestoneName: {}, TaskName: "" });
       setSelectedTasks({
-        milestoneName: "",
+        milestoneName: {},
         TaskName: [],
       });
     }
@@ -169,7 +234,7 @@ function AddTemplateMain() {
   };
 
   const deleteSelectedMilestone = (idx) => {
-    console.log(formData.milestones);
+    // console.log(formData.milestones);
     let newArray = formData.milestones.filter((task, index) => index !== idx);
     setFormData((prev) => ({
       ...prev,
@@ -193,70 +258,64 @@ function AddTemplateMain() {
 
   const NewMIileStoneValidate = () => {
     const errors = {};
-    let validate = true;
 
     if (!newMilstoneValue.trim()) {
       errors.newMilstoneValue = "Milestone name is required";
-      validate = false;
     }
 
-    console.log(errors, "errors");
+    // console.log(errors, "errors");
     setErrorData(errors);
-    return validate;
+    return Object.keys(errors).length === 0;
   };
 
   const taskValidate = () => {
     const errors = {};
-    let validate = true;
 
-    if (!tasks.milestoneName.trim()) {
+    if (Object.keys(tasks.milestoneName).length === 0) {
       errors.milestoneName = "Milestone name is required";
-      validate = false;
     }
 
     if (!tasks.TaskName.trim()) {
       errors.TaskName = "Task name is required";
-      validate = false;
     }
 
-    console.log(errors, "errors");
+    // console.log(errors, "errors");
     setErrorData(errors);
-    return validate;
+    return Object.keys(errors).length === 0;
   };
 
   const validate = () => {
     const errors = {};
     let validate = true;
 
-    if (!formData.templateType) {
-      errors.templateType = "Template type is required";
-      validate = false;
+    if (!formData.template_type) {
+      errors.template_type = "Template type is required";
     }
 
-    if (!formData.templateName) {
-      errors.templateName = "Template name is required";
-      validate = false;
+    if (!formData.template_name) {
+      errors.template_name = "Template name is required";
     }
 
     if (formData?.milestones?.length === 0) {
       errors.selectedTasksTaskName = "Add any tasks to save milestone";
-      validate = false;
     }
+    formData.colour.forEach((item) => {
+      if (!item.color) {
+        errors[item.name] = `${item.name} color is required`;
+      }
+    });
 
     // if (!tasks.milestoneName.trim()) {
     //   errors.milestoneName = "Milestone name is required";
-    //   validate = false;
     // }
 
     // if (!tasks.TaskName.trim()) {
     //   errors.TaskName = "Task name is required";
-    //   validate = false;
     // }
 
     setErrorData(errors);
-    return validate;
+    return Object.keys(errors).length === 0;
   };
-  console.log(errorData, "errors");
 
   // submit or cancel form operations --------------------------------
 
@@ -280,11 +339,9 @@ function AddTemplateMain() {
       };
       console.log(formData);
       setTemplateData((prev) => [...prev, data]);
-      navigate("/");
+      // navigate("/");
     }
   };
-
-  console.log(templateData, "templateData");
 
   return (
     <>
@@ -418,16 +475,29 @@ function AddTemplateMain() {
             width: "100%",
           }}
         >
-          <Typography
+          <Box
             sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.625rem",
               mt: "2.5rem",
               mb: "1.563rem",
-              fontSize: "1rem",
-              fontWeight: "500",
             }}
           >
-            Add templates
-          </Typography>
+            <KeyboardBackspaceIcon
+              onClick={() => navigate("/")}
+              sx={{ cursor: "pointer" }}
+            />
+            <Typography
+              sx={{
+                fontSize: "1rem",
+                fontWeight: "500",
+              }}
+            >
+              Add templates
+            </Typography>
+          </Box>
+
           <Box
             sx={{
               padding: "2.5rem",
@@ -459,10 +529,12 @@ function AddTemplateMain() {
                 <SelectFieldWithLabel
                   label={"Select"}
                   handleChange={handleChange}
-                  name={"templateType"}
+                  name={"template_type"}
+                  value={formData?.template_type}
                   optionList={templateOptions}
-                  error={Boolean(errorData.templateType)}
-                  helperText={errorData.templateType}
+                  error={Boolean(errorData?.template_type)}
+                  helperText={errorData?.template_type}
+                  component={"template_type"}
                 />
               </Box>
 
@@ -481,11 +553,12 @@ function AddTemplateMain() {
                 </Typography>
                 <NormalTextField
                   handleChange={handleChange}
-                  name={"templateName"}
+                  name={"template_name"}
+                  value={formData?.template_name}
                   placeholder={"Please select"}
                   removeFocusedBorder={true}
-                  error={Boolean(errorData.templateName)}
-                  helperText={errorData.templateName}
+                  error={Boolean(errorData?.template_name)}
+                  helperText={errorData?.template_name}
                 />
               </Box>
             </Box>
@@ -501,6 +574,27 @@ function AddTemplateMain() {
               Colours
             </Typography>
             <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: "1.25rem",
+              }}
+            >
+              {formData?.colour?.map((item) => (
+                <div key={item.id}>
+                  <ColorPicker
+                    label={`${item.name} colour`}
+                    id={item.name}
+                    value={item.color}
+                    name={item.name}
+                    handleChange={(e) => handleColorChange(e, item.id)}
+                    error={Boolean(errorData[item.name])}
+                    helperText={errorData[item.name]}
+                  />
+                </div>
+              ))}
+            </Box>
+            {/* <Box
               sx={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr 1fr",
@@ -528,7 +622,7 @@ function AddTemplateMain() {
                 name="delayedColor"
                 handleChange={handleChange}
               />
-            </Box>
+            </Box> */}
             {/* milestones */}
             <Box
               sx={{
@@ -540,7 +634,7 @@ function AddTemplateMain() {
               <Box
                 sx={{
                   display: "flex",
-                  alignItems: "end",
+                  // alignItems: "end",
                   justifyContent: "space-between",
                 }}
               >
@@ -566,7 +660,7 @@ function AddTemplateMain() {
                     >
                       Milestone name <span>*</span>
                     </Typography>
-                    <AutoCompleteSelectField
+                    {/* <AutoCompleteSelectField
                       handleAddnewButton={handleModalOpen}
                       handleChange={handleTaskChanges}
                       name={"milestoneName"}
@@ -574,6 +668,16 @@ function AddTemplateMain() {
                       value={tasks.milestoneName}
                       error={Boolean(errorData.milestoneName)}
                       helperText={errorData.milestoneName}
+                    /> */}
+                    <MilestoneInput
+                      handleAddnewButton={handleModalOpen}
+                      handleChange={handleTaskMilestoneChanges}
+                      name={"milestoneName"}
+                      optionList={mileStonesListed}
+                      value={tasks.milestoneName}
+                      error={Boolean(errorData.milestoneName)}
+                      helperText={errorData.milestoneName}
+                      label={"Please type"}
                     />
                   </Box>
 
@@ -612,6 +716,7 @@ function AddTemplateMain() {
                     height: "2.5rem",
                     width: "7.375rem",
                     padding: "0.375rem 0.5rem",
+                    mt: "1.6rem",
                     "&:hover": {
                       background: "#ffff",
                       color: "rgba(0,0,128,0.4)",
@@ -746,7 +851,7 @@ function AddTemplateMain() {
                   gap: "0.625rem",
                 }}
               >
-                {formData.milestones.map((mstn, i) => (
+                {formData?.milestones?.map((mstn, i) => (
                   <Box
                     key={i}
                     sx={{
@@ -819,7 +924,7 @@ function AddTemplateMain() {
                           },
                         }}
                       >
-                        <Star /> {mstn.milestoneName}
+                        <Star /> {mstn.milestoneName.name}
                       </Button>
                     </Box>
                     <Box>

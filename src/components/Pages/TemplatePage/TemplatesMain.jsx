@@ -4,6 +4,7 @@ import TemplateTable from "./TemplateTable";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { templateFindAllAction } from "../../../Redux/Action/ThemeAction";
+import TableNoItemComponent from "../../Common/TableNoItemComponent";
 
 function TemplatesMain() {
   const navigate = useNavigate();
@@ -59,14 +60,14 @@ function TemplatesMain() {
         </Typography>
         <Button
           sx={{
-            px: "1.75rem",
-            py: "0.375rem",
+            padding: "0.375rem 1.75rem ",
             color: "#000080",
             border: "0.063rem solid #000080",
             borderRadius: "3.125rem",
             fontWeight: "500",
             fontSize: "0.75rem",
             textTransform: "initial",
+            minWidth:"0",
           }}
           onClick={() => navigate(`/add-templates`)}
         >
@@ -95,6 +96,7 @@ function TemplatesMain() {
               "& input": {
                 outline: "none",
                 border: "none",
+                fontSize: "0.875rem",
                 width: "calc(100% - 1.625rem)",
               },
             }}
@@ -109,6 +111,10 @@ function TemplatesMain() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                "& svg": {
+                  width: "0.875rem",
+                  height: "0.875rem",
+                },
               }}
             >
               <svg
@@ -127,7 +133,11 @@ function TemplatesMain() {
               </svg>
             </Box>
           </Box>
-          <TemplateTable data={data} />
+          {data && data.length > 0 ? (
+            <TemplateTable data={data} />
+          ) : (
+            <TableNoItemComponent />
+          )}
         </Box>
       </Box>
     </Box>

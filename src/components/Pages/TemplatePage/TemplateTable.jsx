@@ -46,20 +46,34 @@ function TemplateTable({ data }) {
     >
       <TableContainer>
         <Table
-          sx={{ minWidth: 700, border: "0.063rem solid #D1D4D7" }}
+          sx={{
+            minWidth: 700,
+            border: "0.063rem solid #D1D4D7",
+            "& td,th": {
+              padding: "1rem",
+            },
+          }}
           aria-label="customized table"
         >
           <TableHead
             sx={{
+              "& svg": {
+                width: "0.5rem",
+                height: "0.5rem",
+                cursor: "pointer",
+              },
               "& th": {
                 color: "#263032",
                 fontWeight: "600",
                 textAlign: "left",
+                fontSize: "0.875rem",
               },
             }}
           >
             <TableRow sx={{}}>
-              <TableCell>Template name</TableCell>
+              <TableCell>
+                Template name <Counter />
+              </TableCell>
               <TableCell align="right">
                 Template type <Counter />
               </TableCell>
@@ -120,7 +134,13 @@ function TemplateTable({ data }) {
                         },
                       }}
                     >
-                      <img src={row?.image_path ? baseurl + row?.image_path : "/avatar.png"} />
+                      <img
+                        src={
+                          row?.image_path
+                            ? baseurl + row?.image_path
+                            : "/avatar.png"
+                        }
+                      />
                     </Box>
                     <Typography sx={{ color: "#263032", fontSize: "0.75rem" }}>
                       {row?.created_user}
@@ -138,6 +158,7 @@ function TemplateTable({ data }) {
                       borderRadius: "0.375rem",
                       width: "fit-content",
                       display: "block",
+                      fontSize: "0.625rem",
                     }}
                   >
                     {row?.status === 1 ? "Active" : "Inactive"}
@@ -148,6 +169,8 @@ function TemplateTable({ data }) {
                   sx={{
                     "& svg": {
                       cursor: "pointer",
+                      width: "1rem",
+                      height: "0.625rem",
                     },
                   }}
                 >
