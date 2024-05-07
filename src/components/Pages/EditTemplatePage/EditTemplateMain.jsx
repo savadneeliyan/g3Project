@@ -1,7 +1,7 @@
 import { Box, Button, FormHelperText, Typography } from "@mui/material";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  AutoCompleteSelectField,
+  MilestoneInput,
   SelectFieldWithLabel,
 } from "../../InputFields/SelectInputFields";
 import ColorPicker from "../../InputFields/ColorPicker";
@@ -11,10 +11,11 @@ import { NormalTextField } from "../../InputFields/TextFields";
 import { DeleteIcon, EditIcon, Star, ViewIcon } from "../../Icons/Icons";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { TemplateContext } from "../../Context/TemplateContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  getColorAction,
+  milestoneFindAllAction,
   templateFindOneByIdAction,
   templateTypeFindAction,
 } from "../../../Redux/Action/ThemeAction";
@@ -22,113 +23,157 @@ import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 
 function EditTemplateMain() {
   const { id } = useParams();
-  const dispatch = useDispatch();
-  // const { templateData, setTemplateData } = useContext(TemplateContext);
   const navigate = useNavigate();
+  const modalRef = useRef();
+  const dispatch = useDispatch();
 
-  // get template data
-  let { templateListFindByIdSuccess } = useSelector((state) => {
-    return state.findTemplateById;
-  });
+  let isUserExist = localStorage.getItem("userDetails")
+    ? JSON.parse(localStorage.getItem("userDetails"))
+    : null;
+
   // get milestone data
+  let { milestoneFindAllSuccess } = useSelector((state) => {
+    return state.getMileStone;
+  });
 
-  // get template types data
+  // add milestone data
+  let { addNewMilestoneSuccess } = useSelector((state) => {
+    return state.addMileStone;
+  });
+
+  // get template type data
   let { getTemplateTypeSuccess } = useSelector((state) => {
     return state.TemplateTypeFind;
   });
 
-  // states --------------------------------
-
-  const [formData, setFormData] = useState({
-    progressionColor: "#FFA500",
-    completedColor: "#008000",
-    delayedColor: "#FF0000",
-    milestones: [],
-  });
-  const [mileStonesListed, setMileStonesListed] = useState([]);
-  const [templateOptions, setTemplateOptions] = useState([]);
-  const [newMilstoneValue, setNewMilstoneValue] = useState();
-  const [tasks, setTasks] = useState({
-    milestoneName: "",
-    TaskName: "",
-  });
-  const [errorData, setErrorData] = useState({});
-  const [selectedTasks, setSelectedTasks] = useState({
-    milestoneName: "",
-    TaskName: [],
+  // get template type data
+  let { getColorSuccess } = useSelector((state) => {
+    return state.getColor;
   });
 
-  // set milestone data
-  // useEffect(() => {
-  //   if (milestoneFindAllSuccess) {
-  //     let filteredArray = milestoneFindAllSuccess.map((item) => item.name);
-  //     setMileStonesListed(filteredArray);
-  //   }
-  // }, [milestoneFindAllSuccess]);
+  // submit form
+  let { submitFormSuccess } = useSelector((state) => {
+    return state.submitForm;
+  });
 
-  // set milestone data
+  // find template by id
+  let { templateListFindByIdSuccess } = useSelector((state) => {
+    return state.findTemplateById;
+  });
+
   useEffect(() => {
-    if (getTemplateTypeSuccess) {
-      let filteredArray = getTemplateTypeSuccess.map(
-        (item) => item.template_name
-      );
-      setTemplateOptions(filteredArray);
-    }
-  }, [getTemplateTypeSuccess]);
+    dispatch(milestoneFindAllAction());
+  }, [addNewMilestoneSuccess]);
 
-  // set template data
   useEffect(() => {
     if (templateListFindByIdSuccess) {
-      setFormData(templateListFindByIdSuccess);
-      //  dispatch(milstoneFindAction(templateListFindByIdSuccess[0]?.company_id));
-      dispatch(
-        templateTypeFindAction(templateListFindByIdSuccess[0]?.company_id)
-      );
+      setFormData(templateListFindByIdSuccess[0]);
     }
   }, [templateListFindByIdSuccess]);
 
   useEffect(() => {
     dispatch(templateFindOneByIdAction(id));
+    dispatch(templateTypeFindAction());
+    dispatch(getColorAction());
   }, []);
 
-  const modalRef = useRef();
-  // useEffect(() => {
-  //   let findItem = templateData.filter((item) => item.id == id);
-  //   setFormData(findItem[0]);
-  //   // console.log(templateData, "findItem");
-  // }, [templateData]);
+  // milestone
+  useEffect(() => {
+    if (milestoneFindAllSuccess) {
+      setMileStonesListed(milestoneFindAllSuccess);
+    }
+  }, [milestoneFindAllSuccess]);
 
-  // dropdown lists --------------------------------
-  let array = [
-    "The Shawshank Redemption",
-    "The Godfather",
-    "The Dark Knight",
-    "12 Angry Men",
-    "Schindler's List",
-    "Pulp Fiction",
-    "The Lord of the Rings: The Return of the King",
-    "customButton",
-  ];
+  useEffect(() => {
+    if (addNewMilestoneSuccess) {
+      setNewMilstoneValue("");
+      handleModalClose();
+    }
+  }, [addNewMilestoneSuccess]);
 
-  // let templateOptions = [
-  //   "installation",
-  //   "crane",
-  //   "template 3",
-  //   "template 4",
-  //   "template 5",
-  //   "template 6",
-  //   "template 7",
-  //   "template 8",
-  //   "template 9",
-  // ];
+  // template type
+  useEffect(() => {
+    if (getTemplateTypeSuccess) {
+      setTemplateOption(getTemplateTypeSuccess);
+    }
+  }, [getTemplateTypeSuccess]);
 
-  // console.log(formData,"azshkjbsa")
+  // color
+  useEffect(() => {
+    if (getColorSuccess) {
+      setFormData((prev) => ({
+        ...prev,
+        ["colours"]: getColorSuccess,
+      }));
+    }
+  }, [getColorSuccess]);
+
+  // submit form
+  useEffect(() => {
+    if (submitFormSuccess) {
+      setFormData({
+        id: 0,
+        company_id: isUserExist.company.id,
+        user_id: isUserExist.user.id,
+        colours: [],
+        milestone: [],
+      });
+      navigate("/");
+    }
+  }, [submitFormSuccess]);
+
+  let [templateOptions, setTemplateOption] = useState([]);
+
+  // states --------------------------------
+
+  const [formData, setFormData] = useState({
+    colours: [],
+    milestone: [],
+  });
+
+  console.log(formData);
+
+  // milestone states --------------------------------
+  const [mileStonesListed, setMileStonesListed] = useState([]);
+  const [newMilstoneValue, setNewMilstoneValue] = useState("");
+  const [taskList, setTasks] = useState({
+    id: "",
+    milestone_name: "",
+    tasks: {},
+  });
+
+  const [errorData, setErrorData] = useState({});
+  const [selectedTasks, setSelectedTasks] = useState({
+    id: "",
+    milestone_name: "",
+    tasks: [],
+  });
+
   // for seting formdata on input change --------------------------------
-  const handleChange = (e) => {
+  const handleColorChange = (e, id) => {
     const { value, name } = e.target;
     setFormData((prev) => ({
       ...prev,
+      colours: prev.colours.map((item) =>
+        item.id === id ? { ...item, color: value } : item
+      ),
+    }));
+    setErrorData((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
+  };
+
+  const handleChange = (e) => {
+    const { value, name } = e.target;
+    console.log(value);
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
+    }));
+    setErrorData((prev) => ({
+      ...prev,
+      [name]: "",
     }));
   };
 
@@ -137,54 +182,80 @@ function EditTemplateMain() {
     modalRef.current.open();
   };
   const handleModalClose = () => {
-    setNewMilstoneValue("");
     modalRef.current.close();
   };
 
   // tasks operations --------------------------------
 
   const handleTaskChanges = (e) => {
+    // console.log(taskList);
     const { value, name } = e.target;
-    if (name === "milestoneName") {
+    let item = {
+      task_id: 0,
+      name: value,
+      display_index: 0,
+    };
+    setTasks((prev) => ({
+      ...prev,
+      [name]: item,
+    }));
+    setErrorData((prev) => ({
+      ...prev,
+      ["tasks"]: "",
+    }));
+  };
+
+  const milestoneRepeatCheck = (name) => {
+    const errors = {};
+
+    if (formData?.milestone.some((item) => item.milestone_name === name)) {
+      errors.milestoneName = "This milestone is unique under the template.";
+    }
+    setErrorData(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleTaskMilestoneChanges = (value) => {
+    if (milestoneRepeatCheck(value.name)) {
       setTasks(() => ({
-        [name]: value,
-        TaskName: "",
+        id: value.id,
+        milestone_name: value.name,
+        tasks: {},
+      }));
+      setErrorData((prev) => ({
+        ...prev,
+        ["milestoneName"]: "",
       }));
 
       setSelectedTasks({
-        milestoneName: "",
-        TaskName: [],
+        id: "",
+        milestone_name: "",
+        tasks: [],
       });
-    } else {
-      setTasks((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
     }
   };
 
   const handleSelectedTasks = () => {
     if (taskValidate()) {
       setSelectedTasks((prev) => ({
-        milestoneName: tasks.milestoneName,
-        TaskName: [...prev.TaskName, tasks.TaskName],
+        id: taskList.id,
+        milestone_name: taskList.milestone_name,
+        display_index: 0,
+        tasks: [...prev.tasks, taskList.tasks],
       }));
 
       setTasks((prev) => ({
         ...prev,
-        TaskName: "",
+        tasks: {},
       }));
     }
   };
 
-  // delete
   const handelAddedTask = (idx) => {
-    let newArray = selectedTasks.TaskName.filter(
-      (task, index) => index !== idx
-    );
+    let newArray = selectedTasks.tasks.filter((task, index) => index !== idx);
     setSelectedTasks((prev) => ({
       ...prev,
-      ["TaskName"]: newArray,
+      ["tasks"]: newArray,
     }));
   };
 
@@ -194,26 +265,20 @@ function EditTemplateMain() {
     if (MileStoneValidate()) {
       setFormData((prev) => ({
         ...prev,
-        milestones: [...prev.milestones, selectedTasks],
+        milestone: [...prev.milestone, selectedTasks],
       }));
-      setTasks({ milestoneName: "", TaskName: "" });
+      setTasks({ id: "", milestone_name: "", tasks: {} });
       setSelectedTasks({
-        milestoneName: "",
-        TaskName: [],
+        id: "",
+        milestone_name: "",
+        tasks: [],
       });
     }
   };
 
   const handleAddNewMilestone = (e) => {
     e.preventDefault();
-    if (NewMIileStoneValidate()) {
-      let filteredArray = mileStonesListed.filter(
-        (item) => item !== "customButton"
-      );
-      let newData = filteredArray.concat([newMilstoneValue, "customButton"]);
-      setMileStonesListed(newData);
-      setNewMilstoneValue("");
-      handleModalClose();
+    if (NewMileStoneValidate()) {
       toast.success("MileStone added successfully", {
         position: "top-right",
         autoClose: 3000,
@@ -225,15 +290,19 @@ function EditTemplateMain() {
         theme: "light",
         transition: Bounce,
       });
+      let data = {
+        company_id: formData.company_id,
+        name: newMilstoneValue,
+      };
+      dispatch(addNewMilestoneAction(data));
     }
   };
 
   const deleteSelectedMilestone = (idx) => {
-    console.log(formData.milestones);
-    let newArray = formData.milestones.filter((task, index) => index !== idx);
+    let newArray = formData.milestone.filter((task, index) => index !== idx);
     setFormData((prev) => ({
       ...prev,
-      ["milestones"]: newArray,
+      ["milestone"]: newArray,
     }));
   };
 
@@ -243,7 +312,7 @@ function EditTemplateMain() {
     const errors = {};
     let validate = true;
 
-    if (selectedTasks.TaskName.length === 0) {
+    if (selectedTasks.tasks.length === 0) {
       errors.selectedTasksTaskName = "Add any tasks to save milestone";
       validate = false;
     }
@@ -251,70 +320,73 @@ function EditTemplateMain() {
     return validate;
   };
 
-  const NewMIileStoneValidate = () => {
+  const NewMileStoneValidate = () => {
     const errors = {};
-    let validate = true;
 
     if (!newMilstoneValue.trim()) {
       errors.newMilstoneValue = "Milestone name is required";
-      validate = false;
     }
 
     // console.log(errors, "errors");
     setErrorData(errors);
-    return validate;
+    return Object.keys(errors).length === 0;
   };
 
   const taskValidate = () => {
     const errors = {};
-    let validate = true;
 
-    if (!tasks.milestoneName.trim()) {
+    if (taskList.milestone_name.trim() === "") {
       errors.milestoneName = "Milestone name is required";
-      validate = false;
     }
 
-    if (!tasks.TaskName.trim()) {
-      errors.TaskName = "Task name is required";
-      validate = false;
+    if (Object.keys(taskList.tasks).length === 0) {
+      errors.tasks = "Task name is required";
+    }
+
+    if (
+      selectedTasks?.tasks.some((item) => item.name === taskList.tasks.name)
+    ) {
+      errors.tasks = "This task is unique under this milestone.";
     }
 
     // console.log(errors, "errors");
     setErrorData(errors);
-    return validate;
+    return Object.keys(errors).length === 0;
   };
 
   const validate = () => {
     const errors = {};
-    let validate = true;
 
-    if (!formData.templateType) {
-      errors.templateType = "Template type is required";
-      validate = false;
+    if (!formData.template_type) {
+      errors.template_type = "Template type is required";
     }
 
-    if (!formData.templateName) {
-      errors.templateName = "Template name is required";
-      validate = false;
+    if (!formData.template_name) {
+      errors.template_name = "Template name is required";
     }
 
-    if (formData.milestones.length === 0) {
-      errors.selectedTasksTaskName = "Please enter atleast one milestone";
-      validate = false;
+    if (formData?.milestone?.length === 0) {
+      errors.selectedTasksTaskName = "Add any tasks to save milestone";
     }
+    formData.colours.forEach((item) => {
+      if (!item.color) {
+        errors[item.name] = `${item.name} color is required`;
+      }
+    });
 
     setErrorData(errors);
-    return validate;
+    return Object.keys(errors).length === 0;
   };
 
   // submit or cancel form operations --------------------------------
 
   const cancelForm = () => {
     setFormData({
-      progressionColor: "#FFA500",
-      completedColor: "#008000",
-      delayedColor: "#FF0000",
-      milestones: [],
+      id: 0,
+      company_id: isUserExist.company.id,
+      user_id: isUserExist.user.id,
+      colours: [],
+      milestone: [],
     });
     setErrorData({});
     navigate("/");
@@ -323,14 +395,27 @@ function EditTemplateMain() {
   const submitForm = () => {
     const randomNumber = Math.floor(Math.random() * 9000) + 1000;
     if (validate()) {
-      let data = {
-        id: randomNumber,
-        ...formData,
-      };
-      // console.log(formData);
-      setTemplateData((prev) => [...prev, data]);
-      navigate("/");
+      dispatch(formSubmitAction(formData));
     }
+  };
+
+  const handleDragStart = (e, index) => {
+    e.dataTransfer.setData("index", index.toString());
+  };
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e, targetIndex) => {
+    const sourceIndex = parseInt(e.dataTransfer.getData("index"));
+    const newItems = [...selectedTasks?.tasks];
+    const [removed] = newItems.splice(sourceIndex, 1);
+    newItems.splice(targetIndex, 0, removed);
+
+    setSelectedTasks((prev) => ({
+      ...prev,
+      tasks: newItems,
+    }));
   };
 
   return (
@@ -391,9 +476,15 @@ function EditTemplateMain() {
           <NormalTextField
             placeholder={"Please type"}
             value={newMilstoneValue}
-            handleChange={(e) => setNewMilstoneValue(e.target.value)}
-            error={Boolean(errorData?.newMilstoneValue)}
-            helperText={errorData?.newMilstoneValue}
+            handleChange={(e) => {
+              setNewMilstoneValue(e.target.value);
+              setErrorData((prev) => ({
+                ...prev,
+                ["newMilstoneValue"]: "",
+              }));
+            }}
+            error={Boolean(errorData.newMilstoneValue)}
+            helperText={errorData.newMilstoneValue}
           />
           <Box
             sx={{
@@ -474,16 +565,20 @@ function EditTemplateMain() {
               mb: "1.563rem",
             }}
           >
-            <KeyboardBackspaceIcon onClick={() => navigate("/")} sx={{cursor:"pointer"}} />
+            <KeyboardBackspaceIcon
+              onClick={() => navigate("/")}
+              sx={{ cursor: "pointer" }}
+            />
             <Typography
               sx={{
                 fontSize: "1rem",
                 fontWeight: "500",
               }}
             >
-              Edit Templates
+              Edit templates
             </Typography>
           </Box>
+
           <Box
             sx={{
               padding: "2.5rem",
@@ -499,7 +594,7 @@ function EditTemplateMain() {
                 gap: "1.25rem",
               }}
             >
-              <Box>
+              <Box sx={{}}>
                 <Typography
                   sx={{
                     color: "#263032",
@@ -512,17 +607,18 @@ function EditTemplateMain() {
                 >
                   Template type <span>*</span>
                 </Typography>
-                {/* {formData?.templateType && ( */}
-                <SelectFieldWithLabel
-                  label={"Select"}
-                  handleChange={handleChange}
-                  name={"templateType"}
-                  optionList={templateOptions}
-                  error={Boolean(errorData?.templateType)}
-                  helperText={errorData?.templateType}
-                  value={formData?.templateType}
-                />
-                {/* )} */}
+                {formData?.template_type && (
+                  <SelectFieldWithLabel
+                    label={"Select"}
+                    handleChange={handleChange}
+                    name={"template_type"}
+                    value={formData?.template_type}
+                    optionList={templateOptions}
+                    error={Boolean(errorData?.template_type)}
+                    helperText={errorData?.template_type}
+                    component={"template_type"}
+                  />
+                )}
               </Box>
 
               <Box sx={{}}>
@@ -540,12 +636,12 @@ function EditTemplateMain() {
                 </Typography>
                 <NormalTextField
                   handleChange={handleChange}
-                  name={"templateName"}
+                  name={"template_name"}
+                  value={formData?.template_name}
                   placeholder={"Please select"}
                   removeFocusedBorder={true}
-                  error={Boolean(errorData?.templateName)}
-                  helperText={errorData?.templateName}
-                  value={formData?.templateName}
+                  error={Boolean(errorData?.template_name)}
+                  helperText={errorData?.template_name}
                 />
               </Box>
             </Box>
@@ -560,6 +656,7 @@ function EditTemplateMain() {
             >
               Colours
             </Typography>
+            {/* colors */}
             <Box
               sx={{
                 display: "grid",
@@ -567,28 +664,21 @@ function EditTemplateMain() {
                 gap: "1.25rem",
               }}
             >
-              <ColorPicker
-                label={"Progressing colour"}
-                id={"progress"}
-                value={formData?.progressionColor}
-                name="progressionColor"
-                handleChange={handleChange}
-              />
-              <ColorPicker
-                label={"Completed colour"}
-                id={"completed"}
-                value={formData?.completedColor}
-                name="completedColor"
-                handleChange={handleChange}
-              />
-              <ColorPicker
-                label={"Delayed colour"}
-                value={formData?.delayedColor}
-                id={"delayed"}
-                name="delayedColor"
-                handleChange={handleChange}
-              />
+              {formData?.colour?.map((item) => (
+                <div key={item.id}>
+                  <ColorPicker
+                    label={`${item.name} colour`}
+                    id={item.name}
+                    value={item.color}
+                    name={item.name}
+                    handleChange={(e) => handleColorChange(e, item.id)}
+                    error={Boolean(errorData[item.name])}
+                    helperText={errorData[item.name]}
+                  />
+                </div>
+              ))}
             </Box>
+
             {/* milestones */}
             <Box
               sx={{
@@ -600,7 +690,7 @@ function EditTemplateMain() {
               <Box
                 sx={{
                   display: "flex",
-                  alignItems: "end",
+                  // alignItems: "end",
                   justifyContent: "space-between",
                 }}
               >
@@ -626,14 +716,19 @@ function EditTemplateMain() {
                     >
                       Milestone name <span>*</span>
                     </Typography>
-                    <AutoCompleteSelectField
+
+                    <MilestoneInput
                       handleAddnewButton={handleModalOpen}
-                      handleChange={handleTaskChanges}
+                      handleChange={handleTaskMilestoneChanges}
                       name={"milestoneName"}
                       optionList={mileStonesListed}
-                      value={tasks?.milestoneName}
-                      error={Boolean(errorData?.milestoneName)}
-                      helperText={errorData?.milestoneName}
+                      value={{
+                        id: taskList.id,
+                        name: taskList.milestone_name,
+                      }}
+                      error={Boolean(errorData.milestoneName)}
+                      helperText={errorData.milestoneName}
+                      label={"Please type"}
                     />
                   </Box>
 
@@ -654,10 +749,10 @@ function EditTemplateMain() {
                       placeholder={"Please type task name"}
                       removeFocusedBorder={true}
                       handleChange={handleTaskChanges}
-                      name={"TaskName"}
-                      value={tasks?.TaskName}
-                      error={Boolean(errorData?.TaskName)}
-                      helperText={errorData?.TaskName}
+                      name={"tasks"}
+                      value={taskList?.tasks?.name ? taskList?.tasks?.name : ""}
+                      error={Boolean(errorData.tasks)}
+                      helperText={errorData.tasks}
                     />
                   </Box>
                 </Box>
@@ -671,6 +766,8 @@ function EditTemplateMain() {
                     transition: "0.5s ease",
                     height: "2.5rem",
                     width: "7.375rem",
+                    padding: "0.375rem 0.5rem",
+                    mt: "1.6rem",
                     "&:hover": {
                       background: "#ffff",
                       color: "rgba(0,0,128,0.4)",
@@ -689,7 +786,7 @@ function EditTemplateMain() {
                   gap: "0.313rem",
                 }}
               >
-                {selectedTasks?.TaskName?.map((tsk, idx) => (
+                {selectedTasks?.tasks?.map((tsk, idx) => (
                   <Box
                     sx={{
                       border: "0.063rem solid #EFEFEF",
@@ -703,6 +800,10 @@ function EditTemplateMain() {
                       justifyContent: "space-between",
                       gap: "1.25rem",
                     }}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, idx)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, idx)}
                   >
                     <Box
                       sx={{
@@ -735,7 +836,7 @@ function EditTemplateMain() {
                           lineHeight: "1.125rem",
                         }}
                       >
-                        {tsk}
+                        {tsk.name}
                       </Typography>
                     </Box>
                     <Box
@@ -743,11 +844,6 @@ function EditTemplateMain() {
                         display: "flex",
                         alignItems: "center",
                         gap: "0.5rem",
-                        "& svg": {
-                          width: "0.625rem",
-                          height: "0.625rem",
-                          cursor: "pointer",
-                        },
                       }}
                     >
                       <DeleteIcon handleClick={() => handelAddedTask(idx)} />
@@ -758,7 +854,7 @@ function EditTemplateMain() {
                 ))}
               </Box>
             </Box>
-            {errorData?.selectedTasksTaskName && (
+            {errorData.selectedTasksTaskName && (
               <FormHelperText
                 sx={{ ml: "0.625rem", color: "red", fontSize: "0.625rem" }}
               >
@@ -810,13 +906,13 @@ function EditTemplateMain() {
                   gap: "0.625rem",
                 }}
               >
-                {formData?.milestones?.map((mstn, i) => (
+                {formData?.milestone?.map((mstn, i) => (
                   <Box
                     key={i}
                     sx={{
                       backgroundColor: "#fff",
                       filter:
-                        "drop-shadow(0.125rem 0.125rem 0.625rem #59667a8f)",
+                        "drop-shadow(0.125rem 0.125rem 0.625 rem #59667a8f)",
                       padding: "1rem 1.25rem 1.25rem",
                       borderRadius: "0.5rem",
                     }}
@@ -883,7 +979,7 @@ function EditTemplateMain() {
                           },
                         }}
                       >
-                        <Star /> {mstn?.milestoneName}
+                        <Star /> {mstn.milestone_name}
                       </Button>
                     </Box>
                     <Box>
@@ -892,8 +988,16 @@ function EditTemplateMain() {
                       >
                         Tasks :{" "}
                       </Typography>
-                      <Box>
-                        {mstn?.TaskName?.map((tsk, j) => (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "start",
+                          flexWrap: "wrap",
+                          gap: "0.5rem",
+                        }}
+                      >
+                        {mstn.tasks.map((tsk, j) => (
                           <Box
                             key={j}
                             sx={{
@@ -906,7 +1010,7 @@ function EditTemplateMain() {
                           >
                             <Box
                               sx={{
-                                padding: "0.25rem",
+                                padding: "0.5rem",
                                 backgroundColor: "#F3F5F6",
                                 borderRadius: "0.375rem",
                                 display: "flex",
@@ -937,7 +1041,7 @@ function EditTemplateMain() {
                                   lineHeight: "1.125rem",
                                 }}
                               >
-                                {tsk}
+                                {tsk.name}
                               </Typography>
                             </Box>
                           </Box>

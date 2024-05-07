@@ -1,17 +1,22 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, Typography } from "@mui/material";
-import { NormalTextField, TextFieldWithLabel } from "../InputFields/TextFields";
+import { Box, Button } from "@mui/material";
+import {  TextFieldWithLabel } from "../InputFields/TextFields";
 import { useNavigate } from "react-router-dom";
-import { Password } from "@mui/icons-material";
 
 function Login() {
   const navigate = useNavigate();
 
   let tocken = {
     access_token:
-      "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vNDQuMjMzLjExMC4xNzAvYXBpL2xvZ2luIiwiaWF0IjoxNzE0ODA0ODA5LCJleHAiOjE3MTQ4NDgwMDksIm5iZiI6MTcxNDgwNDgwOSwianRpIjoiOUNYZGN1amVFUE8xb3labiIsInN1YiI6IjI0MyIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.F1z8HxiP6XwgyoKjgj7AyDayyu9y-c6Q7FReHXGrqNI",
-    company: { id: 36 },
-    user: { id: 243, role: 2, tour: 1 },
+      "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vNDQuMjMzLjExMC4xNzAvYXBpL2xvZ2luIiwiaWF0IjoxNzE1MDk0MTc5LCJleHAiOjE3MTUxMzczNzksIm5iZiI6MTcxNTA5NDE3OSwianRpIjoiN3k2NjYzN0IyMEFPNHRtbSIsInN1YiI6IjUxMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.uWdD3pLrEkqDwMYORMaOLcvP251wrIZm9ghQ9aB1i_c",
+    user: {
+      id: 512,
+      role: 2,
+      tour: 1,
+    },
+    company: {
+      id: 80,
+    },
   };
 
   const [loginData, setLoginData] = useState({});
@@ -33,10 +38,10 @@ function Login() {
   const validate = () => {
     let error = {};
     let emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-    if (!loginData.userName) {
-      error.userName = "Please enter a email";
-    } else if (!emailRegex.test(loginData.userName)) {
-      error.userName = "please enter a valid email";
+    if (!loginData.email) {
+      error.email = "Please enter a email";
+    } else if (!emailRegex.test(loginData.email)) {
+      error.email = "please enter a valid email";
     }
 
     if (!loginData.password) {
@@ -50,6 +55,7 @@ function Login() {
   const handleLogin = () => {
     if (validate()) {
       localStorage.setItem("userDetails", JSON.stringify(tocken));
+      console.log(loginData);
       navigate("/");
     }
   };
@@ -71,10 +77,10 @@ function Login() {
       >
         <TextFieldWithLabel
           label="Email Address"
-          value={loginData?.userName}
-          name={"userName"}
-          error={Boolean(errorData?.userName)}
-          helperText={errorData?.userName}
+          value={loginData?.email}
+          name={"email"}
+          error={Boolean(errorData?.email)}
+          helperText={errorData?.email}
           handleChange={handleChange}
         />
         <TextFieldWithLabel

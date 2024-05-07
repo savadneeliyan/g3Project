@@ -56,7 +56,8 @@ function Sidebar() {
       <Box
         sx={{
           backgroundColor: "#fff",
-          filter: "drop-shadow(0.125rem 0.125rem 0.625rem #59667a8f)",
+          // filter: "drop-shadow(0.125rem 0.125rem 0.625rem #59667a8f)",
+          boxShadow:"0 0 21px 0 #59667a1a",
           position: "absolute",
           left: "0",
           top: 0,

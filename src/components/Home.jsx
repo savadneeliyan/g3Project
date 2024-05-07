@@ -8,6 +8,7 @@ function Home() {
       sx={{
         height: "calc(100vh - 4.125rem)",
         width: "calc(100vw - 4.813rem)",
+        overflow: "scroll",
       }}
     >
       <Box

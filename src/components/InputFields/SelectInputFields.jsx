@@ -33,6 +33,9 @@ export const SelectFieldWithOutBorder = ({ value, handleChange, ...props }) => {
       label="Age"
       IconComponent={() => <KeyboardArrowDownIcon />}
       sx={{
+        "&.MuiMenu-list": {
+          py: "0.5rem",
+        },
         "& fieldset": {
           display: "none",
         },
@@ -47,19 +50,21 @@ export const SelectFieldWithOutBorder = ({ value, handleChange, ...props }) => {
       {...props}
     >
       <MenuItem
-        value={"David Nowak"}
+        value={value}
         sx={{
           "&.MuiMenuItem-root": {
+            minHeight: "auto",
             padding: "0.375rem 1rem",
           },
         }}
       >
-        David Nowak
+        {value}
       </MenuItem>
       <MenuItem
         value={"logout"}
         sx={{
           "&.MuiMenuItem-root": {
+            minHeight: "auto",
             padding: "0.375rem 1rem",
           },
         }}
@@ -141,7 +146,7 @@ export const SelectFieldWithLabel = ({
               fontWeight: "500",
             }}
             key={i}
-            value={component === "template_type" ? item.template_name : item}
+            value={component === "template_type" ? item.id : item}
           >
             {component === "template_type" ? item.template_name : item}
           </MenuItem>
@@ -475,6 +480,7 @@ export const MilestoneInput = ({
                   setOpenList(true);
                 }}
                 onFocus={() => setOpenList(true)}
+                onClick={() => setOpenList(true)}
                 size="small"
                 placeholder={label}
                 error={error}

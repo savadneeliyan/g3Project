@@ -1,12 +1,29 @@
 import { Box, MenuItem, Select } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SelectFieldWithOutBorder } from "../InputFields/SelectInputFields";
+import { useDispatch, useSelector } from "react-redux";
+import { userDetailsAction } from "../../Redux/Action/ThemeAction";
 
 function Header() {
+  let { userDetailsSuccess } = useSelector((state) => state.userDetails);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (userDetailsSuccess) {
+      setFormData({
+        username:
+          userDetailsSuccess.first_name + " " + userDetailsSuccess.last_name,
+      });
+    }
+  }, [userDetailsSuccess]);
+
+  useEffect(() => {
+    dispatch(userDetailsAction());
+  }, []);
+
   const [formData, setFormData] = useState({
-    username: "David Nowak",
+    username: "User",
   });
-  const handleChange = () => {};
 
   return (
     <Box
@@ -38,14 +55,13 @@ function Header() {
             "& img": {
               width: "100%",
               height: "100%",
-            }
+            },
           }}
         >
           <img src="/profile.png" alt="profile image" />
         </Box>
         <SelectFieldWithOutBorder
           value={formData?.username}
-          handleChange={handleChange}
         />
       </Box>
     </Box>
